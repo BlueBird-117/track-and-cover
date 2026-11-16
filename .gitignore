@@ -1,0 +1,13 @@
+# Python environment and caches
+.venv/
+__pycache__/
+*.pyc
+
+# PyInstaller build output (the EXE goes in a GitHub Release, not the repository)
+build/
+dist/
+*.spec
+*.exe
+
+# Not for the repository
+marketing/
