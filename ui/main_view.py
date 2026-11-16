@@ -430,7 +430,7 @@ class AquaNightView:
         icon(("titleglow", glow_px, S), lambda: T.render_text_glow(self.app_name, glow_px, S), tx, ty)
         c.create_text(tx, ty, text=self.app_name, font=tf, fill=T.TEXT_PRIMARY, anchor="nw", tags=("chrome",))
         badge_f = body(13, 700)
-        bw = round(badge_f.measure("v1.1 Beta") + 46 * S)
+        bw = round(badge_f.measure("v2.0 Beta") + 46 * S)
         bh = round(30 * S)
         bx = hx + hw - lp(16, 24) * S - bw
         by = hy + (hh - bh) / 2
@@ -443,7 +443,7 @@ class AquaNightView:
         icon(("badge", bw, bh, S), lambda: T.render_pill(bw, bh, "badge", "normal", S), bx, by)
         dot = round(8 * S)
         icon(("okdot", dot, S), lambda: T.render_dot(dot, T.ACCENT_OK, S), bx + 14 * S, by + (bh - dot) / 2)
-        c.create_text(bx + 14 * S + dot + 8 * S, by + bh / 2, text="v1.1 Beta", font=badge_f, fill=T.TEXT_BODY,
+        c.create_text(bx + 14 * S + dot + 8 * S, by + bh / 2, text="v2.0 Beta", font=badge_f, fill=T.TEXT_BODY,
                       anchor="w", tags=("chrome",))
 
         # ---- folder row -------------------------------------------------------------

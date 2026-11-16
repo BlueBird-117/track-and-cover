@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Track &amp; Cover: MP3 tags, cover art and lyrics for Windows</title>
+<meta name="description" content="Track & Cover is a free, open-source Windows app that finds verified song details, high-resolution cover art and lyrics, lets you review every match, then writes them into your MP3s.">
+<meta property="og:title" content="Track & Cover">
+<meta property="og:description" content="Find verified song details, cover art and lyrics, review every match, then write them into your MP3s. Free for Windows.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#04101c">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<style>
+/* ---- fonts (bundled, OFL) ---- */
+@font-face{font-family:"Exo 2";font-weight:600;font-display:swap;src:url("assets/fonts/Exo2-600.ttf") format("truetype")}
+@font-face{font-family:"Exo 2";font-weight:700;font-display:swap;src:url("assets/fonts/Exo2-700.ttf") format("truetype")}
+@font-face{font-family:"Nunito Sans";font-weight:400;font-display:swap;src:url("assets/fonts/NunitoSans-400.ttf") format("truetype")}
+@font-face{font-family:"Nunito Sans";font-weight:700;font-display:swap;src:url("assets/fonts/NunitoSans-700.ttf") format("truetype")}
+
+/* ---- Aqua Night tokens ---- */
+:root{
+  --bg:#04101c; --text:#e8f6ff; --muted:#a9cde2; --label:#cfeeff; --sub:#b9dcf0;
+  --accent:#38d6ff; --ok:#45f0c8; --violet:#7aa0ff;
+  --glass-border:rgba(160,230,255,.26); --glass-hi:rgba(255,255,255,.35);
+  --radius:26px;
+  --gloss-primary:linear-gradient(180deg,#4ab2e6 0%,#0f6fb3 49%,#075794 51%,#0a68a8 100%);
+  --gloss-secondary:linear-gradient(180deg,rgba(255,255,255,.26) 0%,rgba(255,255,255,.10) 50%,rgba(255,255,255,.04) 51%,rgba(255,255,255,.12) 100%);
+  --glass:linear-gradient(180deg,rgba(255,255,255,.12) 0%,rgba(255,255,255,.04) 30%,rgba(255,255,255,.03) 100%);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; min-height:100vh; color:var(--text); background-color:var(--bg);
+  font:400 17px/1.6 "Nunito Sans","Segoe UI",system-ui,sans-serif;
+  background-image:
+    radial-gradient(circle at 12% 8%,rgba(0,190,255,.34) 0%,rgba(0,190,255,0) 32%),
+    radial-gradient(circle at 90% 4%,rgba(90,110,255,.32) 0%,rgba(90,110,255,0) 30%),
+    radial-gradient(circle at 78% 60%,rgba(0,255,210,.14) 0%,rgba(0,255,210,0) 34%),
+    radial-gradient(circle at 15% 70%,rgba(40,140,255,.18) 0%,rgba(40,140,255,0) 30%),
+    linear-gradient(160deg,#061a2e 0%,#04101c 55%,#071528 100%);
+  background-attachment:fixed;
+}
+a{color:#7fdcff} a:hover{color:#c4f1ff}
+:focus-visible{outline:2px solid #9be6ff;outline-offset:3px;border-radius:8px}
+img{max-width:100%;height:auto}
+h1,h2,h3{font-family:"Exo 2","Segoe UI",sans-serif;color:#fff;margin:0;line-height:1.15}
+.wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:0 24px}
+.skip{position:absolute;left:-999px;top:8px;background:#0f6fb3;color:#fff;padding:8px 14px;border-radius:10px;z-index:10}
+.skip:focus{left:16px}
+
+/* ---- drifting bubbles (decor) ---- */
+.orbs{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.orbs span{position:absolute;border-radius:50%;background:radial-gradient(circle at 32% 28%,rgba(255,255,255,.7) 0%,rgba(140,225,255,.25) 30%,rgba(20,120,200,.08) 70%,rgba(20,120,200,0) 100%);box-shadow:inset 0 0 0 1px rgba(190,240,255,.22)}
+.orbs .a{left:6%;top:62%;width:90px;height:90px;animation:floatA 13s ease-in-out infinite}
+.orbs .b{left:44%;top:30%;width:54px;height:54px;animation:floatB 11s ease-in-out -4s infinite}
+.orbs .c{right:12%;top:48%;width:130px;height:130px;animation:floatA 17s ease-in-out -8s infinite;background:radial-gradient(circle at 32% 28%,rgba(255,255,255,.6) 0%,rgba(160,170,255,.22) 30%,rgba(60,80,200,.08) 70%,rgba(60,80,200,0) 100%)}
+.orbs .d{right:6%;top:84%;width:64px;height:64px;animation:floatB 15s ease-in-out -10s infinite}
+@keyframes floatA{0%{opacity:0;transform:translate(0,40px) scale(.85)}25%{opacity:1}60%{opacity:.85}100%{opacity:0;transform:translate(60px,-120px) scale(1.08)}}
+@keyframes floatB{0%{opacity:0;transform:translate(0,0) scale(1)}30%{opacity:.9}70%{opacity:.7}100%{opacity:0;transform:translate(-80px,-90px) scale(1.15)}}
+@media (prefers-reduced-motion:reduce){.orbs span{animation:none;opacity:.4}html{scroll-behavior:auto}}
+
+/* ---- glass + buttons ---- */
+.glass{border:1px solid var(--glass-border);border-radius:var(--radius);background:var(--glass);
+  -webkit-backdrop-filter:blur(18px) saturate(140%);backdrop-filter:blur(18px) saturate(140%);
+  box-shadow:inset 0 1px 0 var(--glass-hi),0 20px 50px rgba(0,0,0,.35)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:48px;padding:0 26px;border-radius:999px;
+  font:700 16px/1 "Nunito Sans","Segoe UI",sans-serif;text-decoration:none;cursor:pointer;transition:filter .15s,transform .15s}
+.btn:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.btn:active{filter:brightness(.92);transform:translateY(1px)}
+.btn-primary{color:#fff;text-shadow:0 1px 2px rgba(0,40,80,.7);border:1px solid rgba(200,240,255,.65);background:var(--gloss-primary);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.75),0 8px 24px rgba(0,150,230,.5)}
+.btn-primary:hover{color:#fff}
+.btn-secondary{color:var(--text);border:1px solid rgba(190,240,255,.45);background:var(--gloss-secondary);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 6px 18px rgba(0,0,0,.3)}
+.btn-secondary:hover{color:#fff}
+.btn-lg{min-height:58px;padding:0 34px;font-size:18px}
+.btn svg{flex-shrink:0}
+
+/* ---- header ---- */
+.topbar{position:sticky;top:12px;z-index:5;margin:12px auto 0;max-width:1180px;padding:0 24px}
+.nav{display:flex;align-items:center;gap:16px;padding:10px 12px 10px 16px;border-radius:999px;
+  background:linear-gradient(180deg,rgba(255,255,255,.16) 0%,rgba(255,255,255,.05) 48%,rgba(255,255,255,.02) 52%,rgba(255,255,255,.05) 100%)}
+.brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none;font:700 19px/1 "Exo 2",sans-serif}
+.brand img{width:38px;height:39px}
+.nav ul{display:flex;gap:4px;margin:0 0 0 auto;padding:0;list-style:none;flex-wrap:wrap}
+.nav ul a{display:inline-block;padding:9px 14px;border-radius:999px;color:var(--label);text-decoration:none;font-weight:700;font-size:15px}
+.nav ul a:hover{color:#fff;background:rgba(255,255,255,.08)}
+.nav .btn{min-height:42px;padding:0 20px;font-size:15px}
+
+/* ---- hero ---- */
+.hero{padding:72px 0 40px;display:grid;grid-template-columns:minmax(0,1fr);gap:44px;text-align:center}
+.hero-logo{width:132px;height:134px;margin:0 auto;filter:drop-shadow(0 10px 26px rgba(0,170,255,.45))}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:14px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#7fdcff}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok)}
+.hero h1{font-size:clamp(44px,8vw,84px);font-weight:700;letter-spacing:.5px;text-shadow:0 0 28px rgba(80,210,255,.55);margin-top:14px}
+.hero p.lead{max-width:720px;margin:18px auto 0;font-size:clamp(18px,2.4vw,22px);color:var(--sub)}
+.cta{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:30px}
+.meta{margin-top:16px;font-size:14px;color:var(--muted)}
+.shot{margin:0;padding:12px;border-radius:30px;box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 26px 70px rgba(0,0,0,.5),0 0 60px rgba(0,150,230,.22)}
+.shot img{display:block;width:100%;border-radius:20px}
+.shot figcaption{margin-top:10px;font-size:14px;color:var(--muted)}
+
+/* ---- sections ---- */
+section{padding:56px 0}
+.section-head{display:flex;align-items:center;gap:12px;margin-bottom:26px}
+.sphere{width:16px;height:16px;border-radius:50%;flex-shrink:0;background:radial-gradient(circle at 35% 30%,#fff 0%,#38d6ff 40%,#0b6fa8 100%);box-shadow:0 0 10px rgba(80,220,255,.8)}
+.sphere.v{background:radial-gradient(circle at 35% 30%,#fff 0%,#7aa0ff 40%,#2a4cc0 100%);box-shadow:0 0 10px rgba(120,150,255,.8)}
+.sphere.m{background:radial-gradient(circle at 35% 30%,#fff 0%,#45f0c8 40%,#0a8a72 100%);box-shadow:0 0 10px rgba(69,240,200,.7)}
+.section-head h2{font-size:clamp(26px,3.4vw,34px);font-weight:600}
+.grid{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.card{padding:26px}
+.card svg{display:block;margin-bottom:14px}
+.card h3{font-size:21px;font-weight:600;margin-bottom:8px}
+.card p{margin:0;color:var(--muted)}
+.steps{counter-reset:step;list-style:none;margin:0;padding:0;display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.steps li{padding:24px;position:relative}
+.steps li::before{counter-increment:step;content:counter(step);display:flex;align-items:center;justify-content:center;width:40px;height:40px;margin-bottom:14px;border-radius:50%;
+  font:700 18px/1 "Exo 2",sans-serif;color:#fff;background:var(--gloss-primary);border:1px solid rgba(200,240,255,.65);box-shadow:inset 0 1px 0 rgba(255,255,255,.7),0 6px 16px rgba(0,150,230,.45)}
+.steps h3{font-size:19px;font-weight:600;margin-bottom:6px}
+.steps p{margin:0;color:var(--muted)}
+.two{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.panel{padding:28px}
+.panel h3{font-size:22px;font-weight:600;margin-bottom:12px}
+.panel p,.panel li{color:var(--muted)}
+.panel ol,.panel ul{margin:0;padding-left:22px}
+.panel li{margin:6px 0}
+.panel strong{color:var(--text)}
+.kbd{display:inline-block;padding:1px 8px;border-radius:7px;border:1px solid rgba(190,240,255,.35);background:rgba(255,255,255,.08);color:#fff;font-weight:700;font-size:.92em;white-space:nowrap}
+.note{display:flex;gap:12px;align-items:flex-start;margin-top:16px;padding:14px 16px;border-radius:16px;background:rgba(0,14,30,.45);border:1px solid rgba(160,230,255,.22)}
+.note svg{flex-shrink:0;margin-top:3px}
+.note p{margin:0;min-width:0}
+.note .kbd{white-space:normal;overflow-wrap:anywhere}
+
+/* ---- FAQ ---- */
+.faq{display:grid;gap:12px}
+.faq details{padding:0;border-radius:20px}
+.faq summary{cursor:pointer;list-style:none;padding:18px 54px 18px 22px;font-weight:700;color:#fff;position:relative;border-radius:20px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"";position:absolute;right:22px;top:50%;width:10px;height:10px;margin-top:-7px;border-right:2px solid var(--accent);border-bottom:2px solid var(--accent);transform:rotate(45deg);transition:transform .2s}
+.faq details[open] summary::after{transform:rotate(-135deg);margin-top:-2px}
+.faq details p{margin:0;padding:0 22px 20px;color:var(--muted)}
+
+/* ---- download band + footer ---- */
+.band{text-align:center;padding:44px 28px}
+.band h2{font-size:clamp(28px,4vw,40px);font-weight:700;text-shadow:0 0 22px rgba(80,210,255,.45)}
+.band p{color:var(--sub);margin:12px auto 0;max-width:620px}
+footer{padding:36px 0 48px;color:var(--muted);font-size:14px}
+footer .row{display:flex;flex-wrap:wrap;gap:10px 24px;justify-content:space-between;align-items:flex-start}
+footer p{margin:4px 0;max-width:640px}
+
+@media (max-width:760px){
+  .nav ul{display:none}
+  .nav .btn{margin-left:auto}
+  .hero{padding-top:48px}
+  section{padding:40px 0}
+}
+@media (max-width:420px){
+  .wrap,.topbar{padding:0 16px}
+  .brand span{display:none}
+  .btn-lg{width:100%;padding:0 16px;font-size:17px;white-space:nowrap}
+  .band{padding:36px 18px}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="orbs" aria-hidden="true"><span class="a"></span><span class="b"></span><span class="c"></span><span class="d"></span></div>
+
+<div class="topbar">
+  <nav class="nav glass" aria-label="Main">
+    <a class="brand" href="#top"><img src="assets/logo.png" alt="" width="38" height="39"><span>Track &amp; Cover</span></a>
+    <ul>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#how">How it works</a></li>
+      <li><a href="#install">Install</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a href="https://github.com/YOUR-USERNAME/track-and-cover" data-link="repo">GitHub</a></li>
+    </ul>
+    <a class="btn btn-primary" href="https://github.com/YOUR-USERNAME/track-and-cover/releases/latest/download/TrackAndCover.exe" data-link="download">Download</a>
+  </nav>
+</div>
+
+<main id="main" class="wrap">
+
+<header class="hero" id="top">
+  <div>
+    <img class="hero-logo" src="assets/logo.png" alt="Track &amp; Cover logo" width="132" height="134">
+    <div style="margin-top:22px"><span class="eyebrow"><span class="dot" aria-hidden="true"></span>Free for Windows · v2.0 Beta</span></div>
+    <h1>Track &amp; Cover</h1>
+    <p class="lead">Tidy up your music library. Find verified song details, high-resolution cover art and lyrics, review every match, then write them into your MP3s.</p>
+    <div class="cta">
+      <a class="btn btn-primary btn-lg" href="https://github.com/YOUR-USERNAME/track-and-cover/releases/latest/download/TrackAndCover.exe" data-link="download">
+        <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
+        Download for Windows
+      </a>
+      <a class="btn btn-secondary btn-lg" href="https://github.com/YOUR-USERNAME/track-and-cover" data-link="repo">
+        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l-6-6 6-6"/><path d="M15 6l6 6-6 6"/></svg>
+        View source on GitHub
+      </a>
+    </div>
+    <p class="meta">Windows 10 / 11 (64-bit) · about 22 MB · no installation needed · free and open source (GPL)</p>
+  </div>
+  <figure class="shot glass">
+    <img src="assets/screenshot.png" width="1652" height="1001" alt="The Track &amp; Cover window: a scanned song on the left, catalog matches from MusicBrainz and Apple on the right, with match details, a cover preview area and the Apply button.">
+    <figcaption>Pick a song, review the catalog matches, then apply.</figcaption>
+  </figure>
+</header>
+
+<section id="features" aria-labelledby="features-h">
+  <div class="section-head"><span class="sphere" aria-hidden="true"></span><h2 id="features-h">What it does</h2></div>
+  <div class="grid">
+    <article class="card glass">
+      <svg aria-hidden="true" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#38d6ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/><path d="M8 11l2 2 4-4"/></svg>
+      <h3>Verified matches</h3>
+      <p>Searches MusicBrainz and Apple's music catalog, ranks the matches and lets you review each one before anything is saved.</p>
+    </article>
+    <article class="card glass">
+      <svg aria-hidden="true" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#7aa0ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>
+      <h3>HD cover art</h3>
+      <p>Previews and embeds 1200&nbsp;px front-cover artwork in the MP3, and can save a PNG copy in an Album Art folder.</p>
+    </article>
+    <article class="card glass">
+      <svg aria-hidden="true" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#38d6ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+      <h3>Lyrics</h3>
+      <p>Fetches song lyrics from LRCLIB, matched by title, artist and song length, and saves them in the MP3's standard lyrics tag.</p>
+    </article>
+    <article class="card glass">
+      <svg aria-hidden="true" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#45f0c8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-4.5"/></svg>
+      <h3>Safe by default</h3>
+      <p>Backs up every original MP3 before changing it, and only fills blank fields unless you choose otherwise.</p>
+    </article>
+    <article class="card glass">
+      <svg aria-hidden="true" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#7aa0ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16"/><path d="M4 12h10"/><path d="M4 18h7"/><path d="M17 15l2 2 3-4"/></svg>
+      <h3>Complete tags</h3>
+      <p>Title, artist, album, album artist, year, release date, genre, track number and, where available, composer.</p>
+    </article>
+    <article class="card glass">
+      <svg aria-hidden="true" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#45f0c8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 18v3"/></svg>
+      <h3>One file, no setup</h3>
+      <p>A single .exe for Windows: no installer and no Python needed. Sharp on high-DPI screens, with full keyboard support.</p>
+    </article>
+  </div>
+</section>
+
+<section id="how" aria-labelledby="how-h">
+  <div class="section-head"><span class="sphere v" aria-hidden="true"></span><h2 id="how-h">How it works</h2></div>
+  <ol class="steps">
+    <li class="glass"><h3>Choose a folder</h3><p>Pick a folder of MP3s and press <span class="kbd">Scan folder</span>. Each song is listed with its current tags.</p></li>
+    <li class="glass"><h3>Search the catalog</h3><p>Select a song and press <span class="kbd">Search catalog</span>. The best matches appear, strongest first.</p></li>
+    <li class="glass"><h3>Review the match</h3><p>Check the details, preview the cover art and fetch the lyrics before you decide.</p></li>
+    <li class="glass"><h3>Apply</h3><p>Press <span class="kbd">Apply to selected MP3</span>. The original is backed up first, then the tags are written.</p></li>
+  </ol>
+</section>
+
+<section id="install" aria-labelledby="install-h">
+  <div class="section-head"><span class="sphere m" aria-hidden="true"></span><h2 id="install-h">Install and first run</h2></div>
+  <div class="two">
+    <div class="panel glass">
+      <h3>Download and run</h3>
+      <ol>
+        <li>Click <strong>Download for Windows</strong>. The file <strong>TrackAndCover.exe</strong> goes to your Downloads folder.</li>
+        <li>If your browser says the file "isn't commonly downloaded", choose <strong>Keep</strong> (in Edge: <strong>⋯ → Keep → Show more → Keep anyway</strong>).</li>
+        <li>Double-click <strong>TrackAndCover.exe</strong>. The first start takes a few seconds.</li>
+        <li>Optional: move it to its own folder and create a desktop shortcut.</li>
+      </ol>
+    </div>
+    <div class="panel glass">
+      <h3>"Windows protected your PC"</h3>
+      <p>Windows shows this blue warning for apps that aren't code-signed by a company. Track &amp; Cover is a free, independent project, so it isn't signed yet.</p>
+      <ol>
+        <li>Click <strong>More info</strong>.</li>
+        <li>Click <strong>Run anyway</strong>.</li>
+      </ol>
+      <p>You only need to do this once. The full source code is public, so anyone can check what the app does.</p>
+    </div>
+  </div>
+  <div class="note glass">
+    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#45f0c8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg>
+    <p><strong>Tip:</strong> try it on a copy of a few songs first. Every original is also backed up automatically to <span class="kbd">%LOCALAPPDATA%\Track &amp; Cover\Backups</span>.</p>
+  </div>
+</section>
+
+<section id="faq" aria-labelledby="faq-h">
+  <div class="section-head"><span class="sphere" aria-hidden="true"></span><h2 id="faq-h">Questions</h2></div>
+  <div class="faq">
+    <details class="glass"><summary>Is it free?</summary><p>Yes. Track &amp; Cover is free and open source under the GNU GPL (version 2 or later). The source code is on GitHub.</p></details>
+    <details class="glass"><summary>Does it work on Mac, Linux or Chromebook?</summary><p>Not yet. The download is for 64-bit Windows 10 and 11 only.</p></details>
+    <details class="glass"><summary>Will it change my music files?</summary><p>Only when you press Apply for a song, after reviewing the match. The original file is backed up first, and by default only empty fields are filled, so your existing tags, artwork and lyrics are kept.</p></details>
+    <details class="glass"><summary>What does it send over the internet?</summary><p>When you search, it sends the song title and artist to MusicBrainz, Apple's music search and LRCLIB, and downloads cover art from the Cover Art Archive or Apple. It doesn't collect, store or send anything else, and it has no accounts, tracking or ads.</p></details>
+    <details class="glass"><summary>My antivirus flagged the download. Is it safe?</summary><p>Some antivirus programs wrongly flag new, unsigned apps built with Python's packaging tools. The full source is public on GitHub, and you can build the app yourself from it. If you trust it, restore the file from quarantine.</p></details>
+    <details class="glass"><summary>A search shows a connection error. What can I do?</summary><p>Try again first. If it keeps happening, a VPN or your antivirus's web/HTTPS scanning may be interrupting secure connections; pause it and try again.</p></details>
+    <details class="glass"><summary>Can I share MP3s with lyrics embedded?</summary><p>Lyrics and cover art are copyrighted by their owners. Saving them into your own files for personal listening is fine, but please don't redistribute them.</p></details>
+  </div>
+</section>
+
+<section aria-labelledby="dl-h">
+  <div class="band glass">
+    <h2 id="dl-h">Give your library the details it deserves</h2>
+    <p>Free, open source and ready to run on Windows 10 and 11.</p>
+    <div class="cta">
+      <a class="btn btn-primary btn-lg" href="https://github.com/YOUR-USERNAME/track-and-cover/releases/latest/download/TrackAndCover.exe" data-link="download">
+        <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
+        Download for Windows
+      </a>
+      <a class="btn btn-secondary btn-lg" href="https://github.com/YOUR-USERNAME/track-and-cover/releases" data-link="releases">All releases and notes</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="wrap">
+  <div class="row">
+    <div>
+      <p><strong style="color:#fff">Track &amp; Cover</strong> · free and open source under GPL-2.0-or-later.</p>
+      <p>Song data from <a href="https://musicbrainz.org/">MusicBrainz</a> and Apple's music catalog; cover art from the <a href="https://coverartarchive.org/">Cover Art Archive</a> and Apple; lyrics from <a href="https://lrclib.net/">LRCLIB</a>. Not affiliated with or endorsed by any of them.</p>
+      <p>Fonts: Exo 2 and Nunito Sans (SIL Open Font License).</p>
+    </div>
+    <p><a href="https://github.com/YOUR-USERNAME/track-and-cover" data-link="repo">Source code</a> · <a href="https://github.com/YOUR-USERNAME/track-and-cover/issues" data-link="issues">Report a problem</a></p>
+  </div>
+</footer>
+
+<script>
+// On GitHub Pages (https://<user>.github.io/<repo>/) fill in the GitHub links automatically.
+// Elsewhere (own domain, local preview) the links keep their written href: replace YOUR-USERNAME there.
+(function () {
+  var host = location.hostname, m = host.match(/^([a-z0-9-]+)\.github\.io$/i);
+  if (!m) return;
+  var repo = location.pathname.split("/").filter(Boolean)[0] || "track-and-cover";
+  var base = "https://github.com/" + m[1] + "/" + repo;
+  var map = { repo: base, releases: base + "/releases", issues: base + "/issues",
+              download: base + "/releases/latest/download/TrackAndCover.exe" };
+  document.querySelectorAll("[data-link]").forEach(function (a) {
+    var url = map[a.getAttribute("data-link")];
+    if (url) a.href = url;
+  });
+})();
+</script>
+</body>
+</html>

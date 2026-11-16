@@ -32,12 +32,16 @@ from mutagen.mp3 import MP3
 
 
 APP_NAME = "Track & Cover"
-APP_VERSION = "0.1.0"
+APP_VERSION = "2.0.0"
+# MusicBrainz asks apps to include a contact in their User-Agent. Once the project is on
+# GitHub, put its address here, e.g. "https://github.com/<username>/track-and-cover".
+PROJECT_URL = ""
 MB_URL = "https://musicbrainz.org/ws/2/recording/"
 CAA_URL = "https://coverartarchive.org"
 ITUNES_URL = "https://itunes.apple.com/search"
 LRCLIB_URL = "https://lrclib.net/api/search"  # free, open lyrics database (no API key)
-USER_AGENT = f"TrackAndCover/{APP_VERSION} (personal desktop MP3 tag editor)"
+USER_AGENT = (f"TrackAndCover/{APP_VERSION} ( {PROJECT_URL} )" if PROJECT_URL
+              else f"TrackAndCover/{APP_VERSION} (personal desktop MP3 tag editor)")
 
 
 def https_context() -> ssl.SSLContext:

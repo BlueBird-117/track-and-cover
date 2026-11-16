@@ -2,7 +2,7 @@
 
 A small Windows desktop MP3 tag editor for reviewing catalog matches, filling verified metadata, embedding cover art, and saving a PNG copy of the cover.
 
-The application source is licensed under GPL-2.0-or-later. Third-party license notices are in `licenses` and are included in the built executable.
+The application source is licensed under GPL-2.0-or-later. Third-party license notices are in `licenses` (summary: `licenses/THIRD-PARTY-NOTICES.md`) and are included in the built executable.
 
 ## Start the app from source
 
@@ -35,8 +35,19 @@ Run `build_windows.ps1` in PowerShell. The finished app is `dist\TrackAndCover.e
 - The drifting background bubbles can be switched off with **Animate background** (remembered in `%LOCALAPPDATA%\Track & Cover\settings.json`). The animation also pauses while the window is minimised or unfocused, and starts off if Windows animation effects are turned off.
 - Keyboard: Tab / Shift+Tab move through fields, buttons and toggles; Space or Enter activates the focused button or toggle.
 
+## Website (GitHub Pages)
+
+The download page lives in `docs/` (`docs/index.html` plus `docs/assets/`). To publish it:
+
+1. Upload the project to a public GitHub repository (the `docs` folder included).
+2. Publish a Release and attach `dist\TrackAndCover.exe`. The file must be named exactly `TrackAndCover.exe`, because the page's Download buttons point to `releases/latest/download/TrackAndCover.exe`.
+3. In the repository: **Settings → Pages → Build and deployment → Source: Deploy from a branch**, then **Branch: main, Folder: /docs**, and **Save**.
+4. After a minute the site is live at `https://<your-username>.github.io/<repository-name>/`.
+
+On a `github.io` address the page fills in your GitHub username and repository for its links automatically. If you host it elsewhere (your own domain, Netlify, Cloudflare Pages), replace `YOUR-USERNAME/track-and-cover` in `docs/index.html` with your own username and repository name.
+
 ## Data sources and rate limits
 
-MusicBrainz asks applications to identify themselves with a User-Agent and limit requests to one per second. Track & Cover identifies itself and spaces MusicBrainz searches accordingly. Cover images are fetched through the Cover Art Archive or the Apple catalog's high-resolution artwork URLs.
+MusicBrainz asks applications to identify themselves with a User-Agent that includes a contact, and to limit requests to one per second. Track & Cover identifies itself and spaces MusicBrainz searches accordingly. When the project has a public home (for example its GitHub repository), set `PROJECT_URL` near the top of `app.py` so it's included in the User-Agent. Cover images are fetched through the Cover Art Archive or the Apple catalog's high-resolution artwork URLs.
 
 This is a personal-use starter build. You remain responsible for reviewing proposed matches and ensuring any use of downloaded artwork complies with applicable rights.

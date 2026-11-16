@@ -1,4 +1,4 @@
-# Track & Cover 1.1 Beta: Source and Upgrade Guide
+# Track & Cover 2.0 Beta: Source and Upgrade Guide
 
 This guide explains what is in the source package, how to run or rebuild the app, and where to make design or feature changes.
 
@@ -12,7 +12,7 @@ The source ZIP contains the Python code and build instructions. It does not cont
 
 ## 2. Extract and open the project
 
-1. Extract `TrackAndCover-1.1-Beta-source.zip` to a normal folder, such as `Documents\TrackAndCover`.
+1. Extract `TrackAndCover-2.0-Beta-source.zip` to a normal folder, such as `Documents\TrackAndCover`.
 2. Open that folder in File Explorer.
 3. Click the address bar, type `powershell`, and press Enter. PowerShell opens in the project folder.
 
