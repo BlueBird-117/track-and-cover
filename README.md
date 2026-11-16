@@ -44,7 +44,7 @@ The download page lives in `docs/` (`docs/index.html` plus `docs/assets/`). To p
 3. In the repository: **Settings → Pages → Build and deployment → Source: Deploy from a branch**, then **Branch: main, Folder: /docs**, and **Save**.
 4. After a minute the site is live at `https://<your-username>.github.io/<repository-name>/`.
 
-On a `github.io` address the page fills in your GitHub username and repository for its links automatically. If you host it elsewhere (your own domain, Netlify, Cloudflare Pages), replace `YOUR-USERNAME/track-and-cover` in `docs/index.html` with your own username and repository name.
+On a `github.io` address the page fills in your GitHub username and repository for its links automatically. Elsewhere (your own domain, Netlify, Cloudflare Pages) the links point to `BlueBird-117/track-and-cover`, as written in `docs/index.html`.
 
 ## Data sources and rate limits
 

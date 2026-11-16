@@ -35,7 +35,7 @@ APP_NAME = "Track & Cover"
 APP_VERSION = "2.0.0"
 # MusicBrainz asks apps to include a contact in their User-Agent. Once the project is on
 # GitHub, put its address here, e.g. "https://github.com/<username>/track-and-cover".
-PROJECT_URL = ""
+PROJECT_URL = "https://github.com/BlueBird-117/track-and-cover"
 MB_URL = "https://musicbrainz.org/ws/2/recording/"
 CAA_URL = "https://coverartarchive.org"
 ITUNES_URL = "https://itunes.apple.com/search"
